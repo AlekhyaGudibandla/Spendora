@@ -27,7 +27,8 @@ export function TransactionModal({
   const [merchant, setMerchant] = useState('')
   const [category, setCategory] = useState('')
   const [amount, setAmount] = useState('')
-  const [type, setType] = useState<'expense' | 'income'>('expense')
+  const [flowType, setFlowType] = useState<'expense' | 'income'>('expense')
+  const [transactionType, setTransactionType] = useState<'investment' | 'purchase'>('purchase')
   const [status, setStatus] = useState<'cleared' | 'pending'>('cleared')
   const [error, setError] = useState<string | null>(null)
 
@@ -36,13 +37,15 @@ export function TransactionModal({
       setMerchant(editingTransaction.merchant)
       setCategory(editingTransaction.category)
       setAmount(String(Math.abs(editingTransaction.amount)))
-      setType(editingTransaction.amount < 0 ? 'expense' : 'income')
+      setFlowType(editingTransaction.amount < 0 ? 'expense' : 'income')
+      setTransactionType(editingTransaction.type || 'purchase')
       setStatus(editingTransaction.status)
     } else {
       setMerchant('')
       setCategory('')
       setAmount('')
-      setType('expense')
+      setFlowType('expense')
+      setTransactionType('purchase')
       setStatus('cleared')
     }
     setError(null)
@@ -60,7 +63,7 @@ export function TransactionModal({
       return
     }
 
-    const finalAmount = type === 'expense' ? -numAmount : numAmount
+    const finalAmount = flowType === 'expense' ? -numAmount : numAmount
 
     if (editingTransaction) {
       updateTransaction(editingTransaction.id, {
@@ -68,6 +71,7 @@ export function TransactionModal({
         category,
         amount: finalAmount,
         status,
+        type: transactionType,
       })
     } else {
       const newTransaction: Transaction = {
@@ -77,6 +81,7 @@ export function TransactionModal({
         category,
         amount: finalAmount,
         status,
+        type: transactionType,
       }
       addTransaction(newTransaction)
     }
@@ -86,13 +91,13 @@ export function TransactionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="sm:max-w-[480px] rounded-3xl border-edge bg-panel/95 backdrop-blur-2xl shadow-2xl overflow-hidden p-0">
+      <DialogContent className="sm:max-w-[480px] rounded-3xl border border-white/10 bg-panel/95 backdrop-blur-2xl shadow-2xl overflow-hidden p-0">
         <div className="bg-gradient-to-br from-primary/10 to-transparent p-6 pb-4">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold tracking-tight text-ink">
-              {editingTransaction ? 'Edit' : 'New'} <span className="text-primary text-2xl">Transaction</span>
+              <span className="text-muted/60 font-medium">{editingTransaction ? 'Edit' : 'New'}</span> <span className="text-primary">{editingTransaction ? 'Transaction' : 'Entry'}</span>
             </DialogTitle>
-            <DialogDescription className="text-muted/80 pt-1">
+            <DialogDescription className="text-muted/50 pt-1 text-xs">
               {editingTransaction ? 'Update the details of your ledger entry.' : 'Record a new movement in your fiscal flow.'}
             </DialogDescription>
           </DialogHeader>
@@ -116,7 +121,7 @@ export function TransactionModal({
                 value={merchant}
                 onChange={(e) => setMerchant(e.target.value)}
                 placeholder="e.g. Apple Store"
-                className="h-11 w-full rounded-2xl border border-edge bg-canvas/30 px-4 text-sm text-ink outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
+                className="h-11 w-full rounded-2xl border border-edge/60 bg-[var(--glass-fill)] px-4 text-sm text-ink outline-none transition-all placeholder:text-muted/40 focus:border-primary/40 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
 
@@ -130,7 +135,7 @@ export function TransactionModal({
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   placeholder="e.g. Tech"
-                  className="h-11 w-full rounded-2xl border border-edge bg-canvas/30 px-4 text-sm text-ink outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
+                  className="h-11 w-full rounded-2xl border border-edge/60 bg-[var(--glass-fill)] px-4 text-sm text-ink outline-none transition-all placeholder:text-muted/40 focus:border-primary/40 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
               <div className="grid gap-2">
@@ -144,29 +149,29 @@ export function TransactionModal({
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0.00"
-                  className="h-11 w-full rounded-2xl border border-edge bg-canvas/30 px-4 text-sm text-ink outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/10"
+                  className="h-11 w-full rounded-2xl border border-edge/60 bg-[var(--glass-fill)] px-4 text-sm text-ink outline-none transition-all placeholder:text-muted/40 focus:border-primary/40 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-widest text-muted/60 pl-1">Type</Label>
+                <Label className="text-xs font-bold uppercase tracking-widest text-muted/60 pl-1">Flow</Label>
                 <div className="flex p-1 gap-1 rounded-2xl bg-canvas/30 border border-edge h-11">
                   <button
-                    onClick={() => setType('expense')}
+                    onClick={() => setFlowType('expense')}
                     className={cn(
                       'flex-1 text-xs font-bold rounded-xl transition-all',
-                      type === 'expense' ? 'bg-panel text-expense shadow-sm ring-1 ring-edge' : 'text-muted hover:text-ink'
+                      flowType === 'expense' ? 'bg-panel text-expense shadow-sm ring-1 ring-edge' : 'text-muted hover:text-ink'
                     )}
                   >
                     Expense
                   </button>
                   <button
-                    onClick={() => setType('income')}
+                    onClick={() => setFlowType('income')}
                     className={cn(
                       'flex-1 text-xs font-bold rounded-xl transition-all',
-                      type === 'income' ? 'bg-panel text-sage shadow-sm ring-1 ring-edge' : 'text-muted hover:text-ink'
+                      flowType === 'income' ? 'bg-panel text-sage shadow-sm ring-1 ring-edge' : 'text-muted hover:text-ink'
                     )}
                   >
                     Income
@@ -174,25 +179,25 @@ export function TransactionModal({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-widest text-muted/60 pl-1">Status</Label>
+                <Label className="text-xs font-bold uppercase tracking-widest text-muted/60 pl-1">Classification</Label>
                 <div className="flex p-1 gap-1 rounded-2xl bg-canvas/30 border border-edge h-11">
                   <button
-                    onClick={() => setStatus('cleared')}
+                    onClick={() => setTransactionType('purchase')}
                     className={cn(
                       'flex-1 text-xs font-bold rounded-xl transition-all',
-                      status === 'cleared' ? 'bg-panel text-sage shadow-sm ring-1 ring-edge' : 'text-muted hover:text-ink'
+                      transactionType === 'purchase' ? 'bg-panel text-ink shadow-sm ring-1 ring-edge' : 'text-muted hover:text-ink'
                     )}
                   >
-                    Cleared
+                    Purchase
                   </button>
                   <button
-                    onClick={() => setStatus('pending')}
+                    onClick={() => setTransactionType('investment')}
                     className={cn(
                       'flex-1 text-xs font-bold rounded-xl transition-all',
-                      status === 'pending' ? 'bg-panel text-muted shadow-sm ring-1 ring-edge' : 'text-muted hover:text-ink'
+                      transactionType === 'investment' ? 'bg-panel text-primary shadow-sm ring-1 ring-edge' : 'text-muted hover:text-ink'
                     )}
                   >
-                    Pending
+                    Invest
                   </button>
                 </div>
               </div>

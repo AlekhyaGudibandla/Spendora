@@ -3,8 +3,8 @@ import { motion } from 'framer-motion'
 import {
   ArrowDownRight,
   ArrowUpRight,
-  Clock,
-  Layers,
+  TrendingUp,
+  Receipt,
   Wallet,
 } from 'lucide-react'
 import { useCardTilt } from '@/hooks/use-tilt'
@@ -36,7 +36,7 @@ type CardProps = {
   trend: string
   trendUp?: boolean
   icon: ReactNode
-  delay?: number
+  colorClass?: string
 }
 
 function OverviewGlassCard({
@@ -46,6 +46,7 @@ function OverviewGlassCard({
   trend,
   trendUp,
   icon,
+  colorClass = 'text-sage bg-moss/15',
 }: CardProps) {
   const { ref, onMove, onLeave } = useCardTilt()
 
@@ -80,16 +81,12 @@ function OverviewGlassCard({
               </p>
               <p className="mt-1 text-[11px] text-muted/80">{subtitle}</p>
             </div>
-            <div className="rounded-xl border border-edge/60 bg-moss/15 p-2 text-sage">
+            <div className={cn('rounded-xl border border-edge/60 p-2', colorClass)}>
               {icon}
             </div>
           </div>
           <div className="mt-6 font-display text-3xl font-semibold tabular-nums tracking-tight text-ink md:text-[1.75rem]">
-            <AnimatedCurrency
-              value={value}
-              format={title === 'Runway' ? 'number' : 'currency'}
-              suffix={title === 'Runway' ? ' wks' : ''}
-            />
+            <AnimatedCurrency value={value} />
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs text-muted">
             {trendUp ? (
@@ -107,15 +104,15 @@ function OverviewGlassCard({
 }
 
 type Props = {
-  netPosition: number
-  monthlySpend: number
-  runwayWeeks: number
+  totalBalance: number
+  totalIncome: number
+  totalExpense: number
 }
 
 export function OverviewCards({
-  netPosition,
-  monthlySpend,
-  runwayWeeks,
+  totalBalance,
+  totalIncome,
+  totalExpense,
 }: Props) {
   return (
     <motion.section
@@ -125,28 +122,30 @@ export function OverviewCards({
       className="grid gap-5 md:grid-cols-3"
     >
       <OverviewGlassCard
-        title="Net position"
-        subtitle="All linked accounts"
-        value={netPosition}
-        trend="+3.1% vs prior month"
+        title="Total Balance"
+        subtitle="Current net worth"
+        value={totalBalance}
+        trend="+2.4% vs month avg"
         trendUp
         icon={<Wallet className="h-4 w-4" />}
       />
       <OverviewGlassCard
-        title="30-day spend"
-        subtitle="Recurring + discretionary"
-        value={-Math.abs(monthlySpend)}
-        trend="−0.8% vs last month"
-        trendUp={false}
-        icon={<Layers className="h-4 w-4" />}
+        title="Total Income"
+        subtitle="Cumulative inflow"
+        value={totalIncome}
+        trend="+14.2% projected"
+        trendUp
+        icon={<TrendingUp className="h-4 w-4" />}
+        colorClass="text-sage bg-moss/15"
       />
       <OverviewGlassCard
-        title="Runway"
-        subtitle="Weeks at current burn"
-        value={runwayWeeks}
-        trend="Stable obligations"
-        trendUp
-        icon={<Clock className="h-4 w-4" />}
+        title="Total Expenses"
+        subtitle="Cumulative outflow"
+        value={totalExpense}
+        trend="−5.1% under budget"
+        trendUp={false}
+        icon={<Receipt className="h-4 w-4" />}
+        colorClass="text-expense bg-expense/10"
       />
     </motion.section>
   )

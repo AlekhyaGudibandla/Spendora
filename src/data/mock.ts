@@ -8,6 +8,7 @@ export const initialTransactions: Transaction[] = [
     category: 'Retail',
     amount: -124.5,
     status: 'cleared',
+    type: 'purchase',
   },
   {
     id: 't2',
@@ -16,6 +17,7 @@ export const initialTransactions: Transaction[] = [
     category: 'Transit',
     amount: -42.0,
     status: 'cleared',
+    type: 'purchase',
   },
   {
     id: 't3',
@@ -24,6 +26,7 @@ export const initialTransactions: Transaction[] = [
     category: 'Dining',
     amount: -68.2,
     status: 'cleared',
+    type: 'purchase',
   },
   {
     id: 't4',
@@ -32,6 +35,7 @@ export const initialTransactions: Transaction[] = [
     category: 'Software',
     amount: -49.0,
     status: 'pending',
+    type: 'purchase',
   },
   {
     id: 't5',
@@ -40,6 +44,7 @@ export const initialTransactions: Transaction[] = [
     category: 'Utilities',
     amount: -210.0,
     status: 'cleared',
+    type: 'purchase',
   },
   {
     id: 't6',
@@ -48,6 +53,7 @@ export const initialTransactions: Transaction[] = [
     category: 'Income',
     amount: 4820.0,
     status: 'cleared',
+    type: 'investment', // Assuming income/payroll is investment in growth
   },
   {
     id: 't7',
@@ -56,6 +62,7 @@ export const initialTransactions: Transaction[] = [
     category: 'Retail',
     amount: -312.0,
     status: 'cleared',
+    type: 'purchase',
   },
   {
     id: 't8',
@@ -64,6 +71,7 @@ export const initialTransactions: Transaction[] = [
     category: 'Wellness',
     amount: -89.0,
     status: 'pending',
+    type: 'purchase',
   },
 ]
 

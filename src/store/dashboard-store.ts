@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { initialTransactions } from '@/data/mock'
+import { api } from '@/services/api'
 
 export type Role = 'viewer' | 'admin'
 
@@ -11,11 +11,19 @@ export type Transaction = {
   category: string
   amount: number
   status: 'cleared' | 'pending'
+  type: 'investment' | 'purchase'
 }
+
+export type SortBy = 'date' | 'amount' | 'merchant'
+export type SortOrder = 'asc' | 'desc'
+export type GroupBy = 'none' | 'category' | 'type'
 
 export type Filters = {
   category: string | null
   search: string
+  sortBy: SortBy
+  sortOrder: SortOrder
+  groupBy: GroupBy
 }
 
 type State = {
@@ -31,44 +39,64 @@ type State = {
   updateTransaction: (id: string, patch: Partial<Transaction>) => void
   addTransaction: (transaction: Transaction) => void
   deleteTransaction: (id: string) => void
+  fetchTransactions: () => Promise<void>
 }
 
 export const useDashboardStore = create<State>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       role: 'viewer',
       theme: 'dark',
-      transactions: initialTransactions,
-      filters: { category: null, search: '' },
+      transactions: [],
+      filters: { 
+        category: null, 
+        search: '',
+        sortBy: 'date',
+        sortOrder: 'desc',
+        groupBy: 'none'
+      },
       isBootLoading: true,
+      
       setRole: (role) => set({ role }),
       toggleTheme: () =>
         set((s) => ({ theme: s.theme === 'dark' ? 'light' : 'dark' })),
       setFilters: (f) =>
         set((s) => ({ filters: { ...s.filters, ...f } })),
       setBootLoading: (isBootLoading) => set({ isBootLoading }),
-      updateTransaction: (id, patch) =>
-        set((s) => {
-          if (s.role !== 'admin') return s
-          return {
-            transactions: s.transactions.map((t) =>
-              t.id === id ? { ...t, ...patch } : t,
-            ),
-          }
-        }),
-      addTransaction: (transaction) =>
-        set((s) => {
-          if (s.role !== 'admin') return s
-          return { transactions: [transaction, ...s.transactions] }
-        }),
-      deleteTransaction: (id) =>
-        set((s) => {
-          if (s.role !== 'admin') return s
-          return { transactions: s.transactions.filter((t) => t.id !== id) }
-        }),
+      
+      fetchTransactions: async () => {
+        set({ isBootLoading: true })
+        const data = await api.getTransactions()
+        set({ transactions: data, isBootLoading: false })
+      },
+
+      updateTransaction: async (id, patch) => {
+        const { role } = get()
+        if (role !== 'admin') return
+        await api.updateTransaction(id, patch)
+        set((s) => ({
+          transactions: s.transactions.map((t) =>
+            t.id === id ? { ...t, ...patch } : t,
+          ),
+        }))
+      },
+
+      addTransaction: async (transaction) => {
+        const { role } = get()
+        if (role !== 'admin') return
+        await api.addTransaction(transaction)
+        set((s) => ({ transactions: [transaction, ...s.transactions] }))
+      },
+
+      deleteTransaction: async (id) => {
+        const { role } = get()
+        if (role !== 'admin') return
+        await api.deleteTransaction(id)
+        set((s) => ({ transactions: s.transactions.filter((t) => t.id !== id) }))
+      },
     }),
     {
-      name: 'spendora-dashboard',
+      name: 'spendora-dashboard-v2',
       partialize: (s) => ({
         role: s.role,
         theme: s.theme,

@@ -10,15 +10,14 @@ export function Dashboard() {
   const {
     transactions,
     isBootLoading,
-    setBootLoading,
+    fetchTransactions,
   } = useDashboardStore()
 
-  const { netPosition, monthlySpend, runwayWeeks } = useDashboardStats(transactions)
+  const { totalBalance, totalIncome, totalExpense, spendingBreakdown } = useDashboardStats(transactions)
 
   useEffect(() => {
-    const t = window.setTimeout(() => setBootLoading(false), 900)
-    return () => window.clearTimeout(t)
-  }, [setBootLoading])
+    fetchTransactions()
+  }, [fetchTransactions])
 
   return (
     <div className="space-y-12">
@@ -34,13 +33,13 @@ export function Dashboard() {
       </header>
 
       <OverviewCards
-        netPosition={netPosition}
-        monthlySpend={monthlySpend}
-        runwayWeeks={runwayWeeks}
+        totalBalance={totalBalance}
+        totalIncome={totalIncome}
+        totalExpense={totalExpense}
       />
 
       <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
-        <ChartsSection />
+        <ChartsSection spendingBreakdown={spendingBreakdown} />
         <InsightsPanel />
       </div>
 
