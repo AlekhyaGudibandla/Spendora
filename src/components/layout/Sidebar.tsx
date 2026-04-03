@@ -6,7 +6,7 @@ import { useDashboardStore } from '@/store/dashboard-store'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 
-export const navItems = [
+const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/' },
   { label: 'Transactions', icon: Receipt, path: '/transactions' },
   { label: 'Analytics', icon: BarChart3, path: '/analytics' },
