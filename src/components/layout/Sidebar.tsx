@@ -52,19 +52,19 @@ export function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
       {/* System Toggles - ONLY visible in sidebar on smaller screens (lg:hidden) */}
       <div className="mt-auto border-t border-edge p-6 space-y-6 lg:hidden">
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-2">
-             <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-3 px-2">
+             <div className="flex items-center gap-3">
                 <User className="h-4 w-4 text-muted" />
-                <span className="text-xs font-medium text-muted uppercase tracking-wider">Role</span>
+                <span className="text-[11px] font-bold text-muted uppercase tracking-[0.1em]">Access Level</span>
              </div>
-             <div className="flex items-center gap-2">
-                <Label className="text-[10px] text-muted">Viewer</Label>
+             <div className="flex items-center justify-around bg-highlight/5 rounded-xl p-3 border border-edge/20">
+                <Label className="text-[10px] font-bold text-muted uppercase tracking-wider">Viewer</Label>
                 <Switch 
                   checked={isAdmin}
                   onCheckedChange={handleRoleChange}
-                  className="scale-90"
+                  className="scale-75"
                 />
-                <Label className="text-[10px] text-muted">Admin</Label>
+                <Label className="text-[10px] font-bold text-muted uppercase tracking-wider">Admin</Label>
              </div>
           </div>
 
